@@ -1,0 +1,421 @@
+
+%Frecuencia de muestreo mayor o igual al doble de la frecuencia máxima
+Fs=1024; %Se recomienda utilizar potencias de 2^n
+Fm=15; %Frecuencia motor
+Ts=1/Fs; %Periodo de muestreo
+%Longitud de muestra de la señal. Mayor a la frecuencia de muestreo.
+%También en potencia de 2. Un n más a la frecuencia.
+L=2048;
+%Vector tiempo
+t=(0:L-1).*Ts;
+%Señal Rango Normal
+SN=(0 + (0.71-0).*rand())*sin(2*pi*(0 + (50-0).*rand())*t);
+AUX=SN;
+for i = 0:10
+   SN=(0 + (0.71-0).*rand())*sin(2*pi*(0 + (50-0).*rand())*t);
+   AUX=AUX+SN;
+end
+SN=AUX; %Suma señales normales
+
+%Señal por desbalance; Admisible/Límite/No Permisible
+SDA = (0.71 + (1.8-0.71).*rand())*sin(2*pi*Fm*t);
+SDL = (1.8 + (2.8-1.8).*rand())*sin(2*pi*Fm*t);
+SDNP = (2.8 + (20-2.8).*rand())*sin(2*pi*Fm*t);
+
+%Señales por desalineación; Admisible/Límite/No Permisible 1X
+SAA1 =(0.71 + (1.8-0.71).*rand())*sin(2*pi*Fm*t);
+SAL1 =(1.8 + (2.8-1.8).*rand())*sin(2*pi*Fm*t);
+SANP1 =(2.8 + (20-2.8).*rand())*sin(2*pi*Fm*t);
+
+%Señales por desalineación; Admisible/Límite/No Permisible 2X
+SAA2 =(0.71 + (1.8-0.71).*rand())*sin(2*pi*2*Fm*t);
+SAL2 =(1.8 + (2.8-1.8).*rand())*sin(2*pi*2*Fm*t);
+SANP2 =(2.8 + (20-2.8).*rand())*sin(2*pi*2*Fm*t);
+
+%Señal por falta de excentricidad; Admisible/Límite/No Permisible
+SEA = (0.71 + (1.8-0.71).*rand())*sin(2*pi*(75 + (50-75).*rand())*t);
+SEL = (1.8 + (2.8-1.8).*rand())*sin(2*pi*(75 + (50-75).*rand())*t);
+SENP = (2.8 + (20-2.8).*rand())*sin(2*pi*(75 + (50-75).*rand())*t);
+
+%Señal por buje defectuoso; Admisible/Límite/No Permisible
+SBA = (0.71 + (1.8-0.71).*rand())*sin(2*pi*((Fm*0.4) + ((Fm*0.6)-(Fm*0.4)).*rand())*t);
+SBL = (1.8 + (2.8-1.8).*rand())*sin(2*pi*((Fm*0.4) + ((Fm*0.6)-(Fm*0.4)).*rand())*t);
+SBNP = (2.8 + (20-2.8).*rand())*sin(2*pi*((Fm*0.4) + ((Fm*0.6)-(Fm*0.4)).*rand())*t);
+
+%Señal por rodamientos defectuosos; Límite/No Permisible CHECAR!
+
+SRL=(1.8 + (2.8-1.8).*rand())*sin(2*pi*((Fm-1) + ((Fm+1)-(Fm-1)).*rand())*t);
+AUX=SRL;
+for i = 0:2
+   SRL=(1.8 + (2.8-1.8).*rand())*sin(2*pi*((Fm-1) + ((Fm+1)-(Fm-1)).*rand())*t);
+   AUX=AUX+SRL;
+end
+SRL=AUX; %Suma armónicos por rodamientos defectuosos
+
+SRNP = (2.8 + (20-2.8).*rand())*sin(2*pi*(75 + (50-75).*rand())*t);
+
+%Vibraciones por partes flojas
+%Poner señales normales pero con valores arriba de admisibles
+
+
+% %Elección random de señales
+n = randi(13);
+fail = 0;
+app.PeligroLamp.Color = [0,0,0];
+
+switch n
+case 1
+SN = SN + SBA;
+naux = randi(4);
+switch naux
+case 1
+SN = SN + SDA;
+fail = 80;
+case 2
+SN = SN + SDL;
+fail = 60;
+app.PeligroLamp.Color = [1,0,0];
+case 3
+SN = SN + SDNP;
+fail = 20;
+app.PeligroLamp.Color = [1,0,0];
+case 4
+SN;
+fail = 90;
+end
+case 2
+SN = SN + SBL;
+naux = randi(4);
+switch naux
+case 1
+SN = SN + SDA;
+fail = 60;
+app.PeligroLamp.Color = [1,0,0];
+case 2
+SN = SN + SDL;
+fail = 40;
+app.PeligroLamp.Color = [1,0,0];
+case 3
+SN = SN + SDNP;
+fail = 10;
+app.PeligroLamp.Color = [1,0,0];
+case 4
+SN;
+fail = 70;
+end
+case 3
+SN = SN + SBNP;
+naux = randi(4);
+switch naux
+case 1
+SN = SN + SDA;
+fail = 20;
+app.PeligroLamp.Color = [1,0,0];
+case 2
+SN = SN + SDL;
+fail = 10;
+app.PeligroLamp.Color = [1,0,0];
+case 3
+SN = SN + SDNP;
+fail = 0;
+app.PeligroLamp.Color = [1,0,0];
+case 4
+SN;
+fail = 30;
+app.PeligroLamp.Color = [1,0,0];
+end
+case 4
+SN = SN + SDA;
+naux = randi(4);
+switch naux
+case 1
+SN = SN + SEA;
+fail = 80;
+case 2
+SN = SN + SEL;
+fail = 60;
+app.PeligroLamp.Color = [1,0,0];
+case 3
+SN = SN + SENP;
+fail = 20;
+app.PeligroLamp.Color = [1,0,0];
+case 4
+fail = 90;
+SN;
+end
+case 5
+SN = SN + SDL;
+naux = randi(4);
+switch naux
+case 1
+SN = SN + SEA;
+fail = 60;
+case 2
+SN = SN + SEL;
+fail = 40;
+app.PeligroLamp.Color = [1,0,0];
+case 3
+SN = SN + SENP;
+fail = 10;
+app.PeligroLamp.Color = [1,0,0];
+case 4
+SN;
+fail = 70;
+app.PeligroLamp.Color = [1,0,0];
+end
+case 6
+SN = SN + SDNP;
+naux = randi(4);
+switch naux
+case 1
+SN = SN + SEA;
+fail = 20 ;
+app.PeligroLamp.Color = [1,0,0];
+case 2
+SN = SN + SEL;
+fail = 10;
+app.PeligroLamp.Color = [1,0,0];
+case 3
+SN = SN + SENP;
+fail = 0;
+app.PeligroLamp.Color = [1,0,0];
+case 4
+SN;
+fail = 30;
+app.PeligroLamp.Color = [1,0,0];
+end
+case 7
+SN = SN + SAA2;
+naux = randi(4);
+switch naux
+case 1
+SN = SN + SBA;
+fail = 80;
+case 2
+SN = SN + SBL;
+fail = 60;
+app.PeligroLamp.Color = [1,0,0];
+case 3
+SN = SN + SBNP;
+fail = 20;
+app.PeligroLamp.Color = [1,0,0];
+case 4
+SN;
+fail = 90;
+end
+case 8
+SN = SN + SAL2;
+naux = randi(4);
+switch naux
+case 1
+SN = SN + SBA;
+fail = 60;
+app.PeligroLamp.Color = [1,0,0];
+case 2
+SN = SN + SBL;
+fail = 40;
+app.PeligroLamp.Color = [1,0,0];
+case 3
+SN = SN + SBNP;
+fail = 10;
+app.PeligroLamp.Color = [1,0,0];
+case 4
+SN;
+fail = 70;
+end
+case 9
+SN = SN + SANP2;
+naux = randi(4);
+switch naux
+case 1
+SN = SN + SBA;
+fail = 20;
+app.PeligroLamp.Color = [1,0,0];
+case 2
+SN = SN + SBL;
+fail = 10;
+app.PeligroLamp.Color = [1,0,0];
+case 3
+SN = SN + SBNP;
+fail = 0;
+app.PeligroLamp.Color = [1,0,0];
+case 4
+SN;
+fail = 30;
+app.PeligroLamp.Color = [1,0,0];
+end
+case 10
+SN = SN + SEA;
+naux = randi(4);
+switch naux
+case 1
+SN = SN + SDA;
+fail = 80;
+app.PeligroLamp.Enable = 'on';
+case 2
+SN = SN + SDL;
+fail = 60;
+app.PeligroLamp.Enable = 'on';
+case 3
+SN = SN + SDNP;
+fail = 20;
+app.PeligroLamp.Enable = 'on';
+case 4
+SN;
+fail = 90;
+app.PeligroLamp.Enable = 'on';
+end
+case 11
+SN = SN + SEL;
+naux = randi(4);
+switch naux
+case 1
+SN = SN + SDA;
+fail = 60;
+app.PeligroLamp.Enable = 'on';
+case 2
+SN = SN + SDL;
+fail = 40;
+app.PeligroLamp.Enable = 'on';
+case 3
+SN = SN + SDNP;
+fail = 10;
+app.PeligroLamp.Enable = 'on';
+case 4
+SN;
+fail = 70;
+end
+case 12
+SN = SN + SENP;
+naux = randi(4);
+switch naux
+case 1
+SN = SN + SDA;
+fail = 20;
+app.PeligroLamp.Enable = 'on';
+case 2
+SN = SN + SDL;
+fail = 10;
+app.PeligroLamp.Enable = 'on';
+case 3
+SN = SN + SDNP;
+fail = 0;
+app.PeligroLamp.Enable = 'on';
+case 4
+SN;
+fail = 30;
+app.PeligroLamp.Enable = 'on';
+end
+case 13
+SN;
+text ='Máquina en buen estado.';
+fail = 100;
+end
+
+%Espectro de frecuencias
+Y=fft(SN); %Que tendrá una parte real (amplitud) e imaginaria (fase)
+P1=2*(abs(Y(1:L/2)/L)); %Se gráfica el espectro de amplitud
+%plot(P1);
+%Sobre L para obtener la amplitud completa
+
+
+
+%Vector de frecuencias
+f=Fs.*(0:(L/2)-1)./L;
+
+%Encontrar picos
+[pks] = findpeaks(P1);
+posaux = pks;
+pos = pks;
+
+for i = 1:length(posaux)
+posaux(i)=find(pks(i)==P1);
+end
+
+for i = 1:length(pos)
+pos(i)=f(posaux(i));
+end
+
+%Clasificar picos
+band = 1;
+text = '';
+
+for i = 1:length(pos)
+
+%Clasificación bujes defectuosos
+if (((0.4*Fm)<=pos(i))&&(pos(i)<=(0.6*Fm)))
+if ((0.71<=pks(i))&&(pks(i)<=1.8))
+text = strcat(text,' Se detectó falla de nivel admisible por bujes defectuosos. ');
+band = 0;
+end
+if((1.8<pks(i))&&(pks(i)<=2.8))
+text = strcat(text,' Se detectó falla de nivel límite por bujes defectuosos. ');
+band = 0;
+end
+if(2.8<pks(i))
+text = strcat(text,' Se detectó falla de nivel no permisible por bujes defectuosos. ');
+band = 0;
+end
+end
+
+%Clasificación desbalances o desalineación en 1X
+if (((Fm-1.5)<=pos(i))&&(pos(i)<=(Fm+1.5)))
+if ((0.71<=pks(i))&&(pks(i)<=1.8))
+text = strcat(text,' Se detectó falla de nivel admisible por desbalance o desalineación. ');
+band = 0;
+end
+if((1.8<pks(i))&&(pks(i)<=2.8))
+text =strcat(text,' Se detectó falla de nivel límite por desbalance o desalineación. ');
+band = 0;
+end
+if(2.8<pks(i))
+text = strcat(text,' Se detectó falla de nivel no permisible por desbalance o desalineación. ');
+band = 0;
+end
+end
+
+%Clasificación desalineación en 2X
+if (((2*Fm-1.5)<=pos(i))&&(pos(i)<=(2*Fm+1.5)))
+if ((0.71<=pks(i))&&(pks(i)<=1.8))
+text = strcat(text,' Se detectó falla de nivel admisible por desalineación. ');
+band = 0;
+end
+if((1.8<pks(i))&&(pks(i)<=2.8))
+text = strcat(text,' Se detectó falla de nivel límite por desalineación. ');
+band = 0;
+end
+if(2.8<pks(i))
+text = strcat(text,' Se detectó falla de nivel no permisible por desalineación. ');
+band = 0;
+end
+end
+%Clasificación excentricidad
+if ((50<=pos(i))&&(pos(i)<=75))
+if ((0.71<=pks(i))&&(pks(i)<=1.8))
+text = strcat(text,' Se detectó falla de nivel admisible por excentricidad. ');
+band = 0;
+end
+if((1.8<pks(i))&&(pks(i)<=2.8))
+text = strcat(text,' Se detectó falla de nivel límite de excentricidad. ');
+band = 0;
+end
+if(2.8<pks(i))
+text = strcat(text,' Se detectó falla de nivel no permisible de excentricidad. ');
+band = 0;
+end
+end
+
+
+end
+
+if band == 1
+text = ' No se detectó ninguna falla.';
+end
+
+
+app.defuncionamientoEditField.Value=fail;
+app.DiagnsticoTextArea.Value = text;
+
+app.UIAxes.XLim = [0 70];
+
+plot(app.UIAxes, f, P1);
